@@ -1,15 +1,15 @@
 # ARG instructions do not create additional layers. Instead, next layers will
 # concatenate them. Also, we have to repeat ARG instructions in each build
 # stage that uses them.
-ARG GOLANG_VERSION
-ARG GOTENBERG_VERSION
+ARG GOLANG_VERSION=1.20
+ARG GOTENBERG_VERSION=snapshot
 
 # ----------------------------------------------
 # Gotenberg binary build stage
 # ----------------------------------------------
 FROM golang:$GOLANG_VERSION AS binary-stage
 
-ARG GOTENBERG_VERSION
+ARG GOTENBERG_VERSION=snapshot
 ENV CGO_ENABLED 0
 
 # Define the working directory outside of $GOPATH (we're using go modules).
@@ -25,18 +25,18 @@ RUN go mod download &&\
 COPY cmd ./cmd
 COPY pkg ./pkg
 
-RUN go build -o gotenberg -ldflags "-X 'github.com/gotenberg/gotenberg/v7/cmd.Version=$GOTENBERG_VERSION'" cmd/gotenberg/main.go
+RUN go build -o gotenberg -ldflags "-X 'github.com/sortspoke/gotenberg/v7/cmd.Version=$GOTENBERG_VERSION'" cmd/gotenberg/main.go
 
 # ----------------------------------------------
 # Final stage
 # ----------------------------------------------
 FROM debian:11-slim
 
-ARG GOTENBERG_VERSION
-ARG GOTENBERG_USER_GID
-ARG GOTENBERG_USER_UID
-ARG NOTO_COLOR_EMOJI_VERSION
-ARG PDFTK_VERSION
+ARG GOTENBERG_VERSION=snapshot
+ARG GOTENBERG_USER_GID=1001
+ARG GOTENBERG_USER_UID=1001
+ARG NOTO_COLOR_EMOJI_VERSION=v2.038
+ARG PDFTK_VERSION=v3.3.3
 
 LABEL author="Julien Neuhart" \
       description="A Docker-powered stateless API for PDF files." \
